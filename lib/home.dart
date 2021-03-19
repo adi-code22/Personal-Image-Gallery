@@ -14,7 +14,7 @@ class Home extends StatefulWidget {
 
 class _HomeState extends State<Home> {
   File _image;
-  String caption, location;
+  String caption = "", location = "";
 
   int _selectedIndex = 0;
   final FirebaseAuth auth = FirebaseAuth.instance;
@@ -24,36 +24,42 @@ class _HomeState extends State<Home> {
   //firebase_storage.UploadTask uploadTask =
 
   FirebaseFirestore firestore1 = FirebaseFirestore.instance;
-  CollectionReference firestore =
-      FirebaseFirestore.instance.collection("user_images");
 
-  Future<void> upload() async {
+  Future<void> upload(String caption, String location) async {
     //Directory appDocDir = await getApplicationDocumentsDirectory();
     String filePath = _image.path;
     print(filePath);
     //'${appDocDir.absolute}/file-to-upload.png';
-    await uploadFile(filePath);
+    await uploadFile(filePath, caption, location);
   }
 
-  Future<void> uploadFile(String filePath) async {
+  Future<void> uploadFile(String filePath, caption, location) async {
     File file = File(filePath);
     final User user = auth.currentUser;
     final email = user.email;
+    CollectionReference firestore =
+        FirebaseFirestore.instance.collection(email);
+    String dt = DateTime.now().toString();
 
     try {
       firebase_storage.UploadTask task = firebase_storage
           .FirebaseStorage.instance
-          .ref('$email/${DateTime.now()}.png')
+          .ref('$email/$dt.png')
           .putFile(file);
       firebase_storage.TaskSnapshot snapshot = await task;
+      String downloadURL = await firebase_storage.FirebaseStorage.instance
+          .ref('$email/$dt.png')
+          .getDownloadURL();
+
+      firestore.add({
+        'img_url': downloadURL,
+        'caption': caption,
+        'location': location,
+      });
     } catch (e) {
+      print(e);
       // e.g, e.code == 'canceled'
     }
-    String downloadURL = await firebase_storage.FirebaseStorage.instance
-        .ref('$email/${DateTime.now()}.png')
-        .getDownloadURL();
-
-    firestore.doc('iDetails').set({'uid': downloadURL});
   }
 
   pickImage() async {
@@ -83,6 +89,9 @@ class _HomeState extends State<Home> {
 
   @override
   Widget build(BuildContext context) {
+    final snackBar = SnackBar(content: Text('Please Upload an Image!'));
+    final snackBarSuccess =
+        SnackBar(content: Text('File Successfully Uploaded'));
     final User user = auth.currentUser;
     final uid = user.email;
     return Scaffold(
@@ -196,6 +205,8 @@ class _HomeState extends State<Home> {
                   onPressed: () {
                     setState(() {
                       _image = null;
+                      caption = null;
+                      location = null;
                     });
                   }),
               _image == null
@@ -213,7 +224,8 @@ class _HomeState extends State<Home> {
                         decoration:
                             InputDecoration(labelText: "Write a caption"),
                         onChanged: (val) => setState(() {
-                          //save this to firestroe
+                          //save this to firestore
+                          caption = val;
                         }),
                       ),
                       TextFormField(
@@ -221,6 +233,7 @@ class _HomeState extends State<Home> {
                             labelText: "Where was this photo taken?"),
                         onChanged: (val) => setState(() {
                           //save this to firestore
+                          location = val;
                         }),
                       )
                     ],
@@ -232,29 +245,37 @@ class _HomeState extends State<Home> {
               ),
               FlatButton(
                   onPressed: () {
-                    upload();
-                    return showDialog(
-                      context: context,
-                      builder: (context) {
-                        return AlertDialog(
-                          title: Text(
-                            "Uploading...",
-                            style: TextStyle(
-                                color: Colors.orange,
-                                fontWeight: FontWeight.bold,
-                                fontSize: 20),
-                          ),
-                          content: Container(
-                            height: 150,
-                            width: 100,
-                            child: Column(
-                              mainAxisAlignment: MainAxisAlignment.start,
-                              children: [],
-                            ),
-                          ),
-                        );
-                      },
-                    );
+                    if (_image != null) {
+                      upload(caption, location);
+                      return ScaffoldMessenger.of(context)
+                          .showSnackBar(snackBarSuccess);
+                      // return showDialog(
+                      //   context: context,
+                      //   builder: (context) {
+                      //     return AlertDialog(
+                      //       actions: [
+                      //         Text(
+                      //           "File was Successfully Uploaded",
+                      //           style: TextStyle(
+                      //               color: Colors.orange,
+                      //               fontWeight: FontWeight.bold,
+                      //               fontSize: 20),
+                      //         ),
+                      //       ],
+                      //       content: Container(
+                      //         height: 150,
+                      //         width: 100,
+                      //         child: Column(
+                      //           mainAxisAlignment: MainAxisAlignment.start,
+                      //           children: [],
+                      //         ),
+                      //       ),
+                      //     );
+                      //   },
+                      // );
+                    } else {
+                      ScaffoldMessenger.of(context).showSnackBar(snackBar);
+                    }
                   },
                   color: Colors.orange,
                   padding: EdgeInsets.fromLTRB(65, 15, 65, 15),

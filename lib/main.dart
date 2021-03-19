@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:internship_main/gallery.dart';
+import 'package:internship_main/loading.dart';
 import 'login.dart';
 import 'signup.dart';
 import "home.dart";
