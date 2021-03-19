@@ -58,6 +58,10 @@ class _HomeState extends State<Home> {
       });
     } catch (e) {
       print(e);
+      String error = e.message.toString();
+
+      final loginerror = SnackBar(content: Text(error));
+      ScaffoldMessenger.of(context).showSnackBar(loginerror);
       // e.g, e.code == 'canceled'
     }
   }
@@ -114,6 +118,24 @@ class _HomeState extends State<Home> {
         onTap: _onItemTapped,
       ),
       appBar: AppBar(
+        actions: [
+          Row(
+            children: [
+              Text(
+                "Log Out",
+                style: TextStyle(color: Colors.orange),
+              ),
+              IconButton(
+                  icon: Icon(
+                    Icons.logout,
+                    color: Colors.orange,
+                  ),
+                  onPressed: () {
+                    Navigator.pushNamed(context, '/login');
+                  }),
+            ],
+          )
+        ],
         centerTitle: true,
         backgroundColor: Colors.white,
         title: Text(
@@ -247,8 +269,8 @@ class _HomeState extends State<Home> {
                   onPressed: () {
                     if (_image != null) {
                       upload(caption, location);
-                      return ScaffoldMessenger.of(context)
-                          .showSnackBar(snackBarSuccess);
+                      // return ScaffoldMessenger.of(context)
+                      //     .showSnackBar(snackBarSuccess);
                       // return showDialog(
                       //   context: context,
                       //   builder: (context) {
