@@ -38,7 +38,20 @@ class _SignUpState extends State<SignUp> {
                         key: _formKey,
                         child: Column(
                           children: [
-                            SizedBox(height: 100.0),
+                            SizedBox(height: 40.0),
+                            CircleAvatar(
+                              radius: 60,
+                              backgroundImage: new NetworkImage(
+                                  'png.pngtree.com/png-vector/20190710/ourmid/pngtree-user-vector-avatar-png-image_1541962.jpg'),
+                            ),
+                            SizedBox(
+                              height: 10,
+                            ),
+                            Text(
+                              "N E W    M E M B E R    L O G I N",
+                              style: TextStyle(fontWeight: FontWeight.bold),
+                            ),
+                            SizedBox(height: 10.0),
                             TextFormField(
                               validator: (val) =>
                                   val.isEmpty || !(val.contains('@'))
@@ -60,6 +73,7 @@ class _SignUpState extends State<SignUp> {
                             ),
                             SizedBox(height: 10.0),
                             TextFormField(
+                              obscureText: true,
                               decoration: InputDecoration(
                                   labelText: 'Confirm Password'),
                               onChanged: (val) =>
@@ -68,38 +82,49 @@ class _SignUpState extends State<SignUp> {
                                   ? null
                                   : "Passwords doesn't match",
                             ),
-                            SizedBox(height: 10.0),
-                            ElevatedButton(
-                                onPressed: () async {
-                                  if (_password == _passwordv) {}
-                                  if (_formKey.currentState.validate() &&
-                                      _password == _passwordv) {
-                                    try {
-                                      setState(() {
-                                        loading = true;
-                                      });
+                            SizedBox(height: 20.0),
+                            FlatButton.icon(
+                              splashColor: Colors.orange,
+                              color: Colors.blue,
+                              padding: EdgeInsets.fromLTRB(30, 10, 30, 10),
+                              icon: Icon(Icons.arrow_circle_up,
+                                  color: Colors.white, size: 25),
+                              onPressed: () async {
+                                if (_password == _passwordv) {}
+                                if (_formKey.currentState.validate() &&
+                                    _password == _passwordv) {
+                                  try {
+                                    setState(() {
+                                      loading = true;
+                                    });
 
-                                      UserCredential user = await FirebaseAuth
-                                          .instance
-                                          .createUserWithEmailAndPassword(
-                                              email: _email,
-                                              password: _password);
-                                      print(user);
-                                      Navigator.pushNamed((context), '/home');
-                                    } catch (e) {
-                                      print(e.message);
-                                      String error = e.message.toString();
-                                      loading = false;
-                                      Navigator.pushReplacementNamed(
-                                          context, '/signup');
-                                      final loginerror =
-                                          SnackBar(content: Text(error));
-                                      ScaffoldMessenger.of(context)
-                                          .showSnackBar(loginerror);
-                                    }
+                                    UserCredential user = await FirebaseAuth
+                                        .instance
+                                        .createUserWithEmailAndPassword(
+                                            email: _email, password: _password);
+                                    print(user);
+                                    Navigator.pushNamed((context), '/home');
+                                  } catch (e) {
+                                    print(e.message);
+                                    String error = e.message.toString();
+                                    loading = false;
+                                    Navigator.pushReplacementNamed(
+                                        context, '/signup');
+                                    final loginerror =
+                                        SnackBar(content: Text(error));
+                                    ScaffoldMessenger.of(context)
+                                        .showSnackBar(loginerror);
                                   }
-                                },
-                                child: Text("SignUp")),
+                                }
+                              },
+                              label: Text(
+                                "SignUp",
+                                style: TextStyle(color: Colors.white),
+                              ),
+                            ),
+                            SizedBox(
+                              height: 10,
+                            ),
                             TextButton(
                                 onPressed: () {
                                   //Navigator.pushNamed(context, '/login');
