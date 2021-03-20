@@ -3,6 +3,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:firebase_storage/firebase_storage.dart' as firebase_storage;
+import 'package:flutter/rendering.dart';
 import 'package:internship_main/loading.dart';
 
 class Gallery extends StatefulWidget {
@@ -78,27 +79,114 @@ class _GalleryState extends State<Gallery> {
                         child: Card(
                           shape: RoundedRectangleBorder(
                               borderRadius: BorderRadius.circular(14.0)),
-                          child: ListTile(
-                            tileColor: Colors.orange,
-                            title: Padding(
-                              padding: EdgeInsets.fromLTRB(0, 10, 0, 10),
-                              child: Column(
-                                children: [
-                                  Image.network(document.data()['img_url']),
-                                  Text(
-                                    "Caption: " + document.data()['caption'],
-                                    style: TextStyle(color: Colors.white),
+                          child: SingleChildScrollView(
+                            // scrollDirection: Axis.horizontal,
+                            child: ListTile(
+                              tileColor: Colors.orange,
+                              title: Padding(
+                                padding: EdgeInsets.fromLTRB(0, 10, 0, 10),
+                                child: SingleChildScrollView(
+                                  scrollDirection: Axis.horizontal,
+                                  child: Row(
+                                    children: [
+                                      CachedNetworkImage(
+                                        imageUrl: document.data()['img_url'],
+                                        imageBuilder:
+                                            (context, imageProvider) =>
+                                                Container(
+                                          height: 100,
+                                          width: 100,
+                                          decoration: BoxDecoration(
+                                              shape: BoxShape.rectangle,
+                                              borderRadius:
+                                                  BorderRadius.circular(100),
+                                              image: DecorationImage(
+                                                  image: imageProvider,
+                                                  fit: BoxFit.fill)),
+                                        ),
+                                      ),
+                                      Column(
+                                        children: [
+                                          Text(
+                                            "Caption: " +
+                                                document.data()['caption'],
+                                            style:
+                                                TextStyle(color: Colors.white),
+                                          ),
+                                          Divider(
+                                            height: 20,
+                                            thickness: 0,
+                                            color: Colors.red,
+                                          ),
+                                          Text(
+                                            "Location: " +
+                                                document.data()['location'],
+                                          ),
+                                        ],
+                                      )
+                                      //Image.network(document.data()['img_url']),
+                                    ],
                                   ),
-                                  Divider(
-                                    height: 20,
-                                    thickness: 0,
-                                    color: Colors.red,
-                                  ),
-                                  Text(
-                                    "Location: " + document.data()['location'],
-                                  ),
-                                ],
+                                ),
                               ),
+                              onTap: () {
+                                // enlargedImage(
+                                //     document.data()['caption'],
+                                //     document.data()['location'],
+                                //     document.data()['img_url']);
+                                return showDialog(
+                                    context: context,
+                                    builder: (context) {
+                                      return AlertDialog(
+                                        insetPadding: EdgeInsets.symmetric(
+                                            horizontal: 10, vertical: 10),
+                                        title: Text(
+                                          "Image Details",
+                                          style:
+                                              TextStyle(color: Colors.orange),
+                                        ),
+                                        content: SingleChildScrollView(
+                                          child: Column(
+                                            children: [
+                                              Text(
+                                                "Caption: " +
+                                                    document.data()['caption'],
+                                                style: TextStyle(
+                                                    fontWeight:
+                                                        FontWeight.bold),
+                                              ),
+                                              Text(
+                                                "Location: " +
+                                                    document.data()['location'],
+                                                style: TextStyle(
+                                                    fontWeight:
+                                                        FontWeight.bold),
+                                              ),
+                                              CachedNetworkImage(
+                                                imageUrl:
+                                                    document.data()['img_url'],
+                                                imageBuilder:
+                                                    (context, imageProvider) =>
+                                                        Container(
+                                                  height: 400,
+                                                  width: 900,
+                                                  decoration: BoxDecoration(
+                                                      shape: BoxShape.rectangle,
+                                                      borderRadius:
+                                                          BorderRadius.circular(
+                                                              10),
+                                                      image: DecorationImage(
+                                                          image: imageProvider,
+                                                          fit: BoxFit
+                                                              .scaleDown)),
+                                                ),
+                                              ),
+                                            ],
+                                          ),
+                                        ),
+                                      );
+                                    });
+                              },
                             ),
                           ),
                         ),

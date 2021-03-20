@@ -91,6 +91,10 @@ class _HomeState extends State<Home> {
     });
   }
 
+  final GlobalKey<FormState> formKey = GlobalKey<FormState>();
+
+  final TextEditingController controlcaption = TextEditingController();
+  final TextEditingController controllocation = TextEditingController();
   @override
   Widget build(BuildContext context) {
     final snackBar = SnackBar(content: Text('Please Upload an Image!'));
@@ -131,7 +135,7 @@ class _HomeState extends State<Home> {
                     color: Colors.orange,
                   ),
                   onPressed: () {
-                    Navigator.pushNamed(context, '/login');
+                    Navigator.pushReplacementNamed(context, '/login');
                   }),
             ],
           )
@@ -222,41 +226,58 @@ class _HomeState extends State<Home> {
                   ),
                 ],
               ),
-              IconButton(
-                  icon: Icon(Icons.delete_forever),
-                  onPressed: () {
-                    setState(() {
-                      _image = null;
-                      caption = null;
-                      location = null;
-                    });
-                  }),
+              _image != null
+                  ? IconButton(
+                      icon: Icon(Icons.delete_forever),
+                      onPressed: () {
+                        setState(() {
+                          _image = null;
+                          caption = null;
+                          location = null;
+                          controlcaption.clear();
+                          controllocation.clear();
+                        });
+                      })
+                  : SizedBox(
+                      height: 0,
+                    ),
               _image == null
                   ? Container()
-                  : Image.file(
-                      _image,
-                      // scale: 3,
+                  : Container(
+                      height: 335,
+                      width: 335,
+                      child: Image.file(
+                        _image,
+                        // scale: 3,
+                      ),
                     ),
               Padding(
                 padding: const EdgeInsets.fromLTRB(30, 0, 30, 0),
                 child: Form(
+                  key: formKey,
                   child: Column(
                     children: [
                       TextFormField(
+                        controller: controlcaption,
                         decoration:
                             InputDecoration(labelText: "Write a caption"),
                         onChanged: (val) => setState(() {
                           //save this to firestore
                           caption = val;
                         }),
+                        validator: (val) =>
+                            val.isEmpty ? "Please provide a caption" : null,
                       ),
                       TextFormField(
+                        controller: controllocation,
                         decoration: InputDecoration(
                             labelText: "Where was this photo taken?"),
                         onChanged: (val) => setState(() {
                           //save this to firestore
                           location = val;
                         }),
+                        validator: (val) =>
+                            val.isEmpty ? "Please provide a location" : null,
                       )
                     ],
                   ),
@@ -267,10 +288,13 @@ class _HomeState extends State<Home> {
               ),
               FlatButton(
                   onPressed: () {
-                    if (_image != null) {
+                    if (_image == null) {
+                      ScaffoldMessenger.of(context).showSnackBar(snackBar);
+                    }
+                    if (formKey.currentState.validate()) {
                       upload(caption, location);
-                      // return ScaffoldMessenger.of(context)
-                      //     .showSnackBar(snackBarSuccess);
+                      return ScaffoldMessenger.of(context)
+                          .showSnackBar(snackBarSuccess);
                       // return showDialog(
                       //   context: context,
                       //   builder: (context) {
@@ -295,8 +319,6 @@ class _HomeState extends State<Home> {
                       //     );
                       //   },
                       // );
-                    } else {
-                      ScaffoldMessenger.of(context).showSnackBar(snackBar);
                     }
                   },
                   color: Colors.orange,
