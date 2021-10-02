@@ -9,7 +9,7 @@ A personal image gallery which stores your data using google firebase services.
 <img align="left" alt="GIF" src="https://github.com/adi-code22/Personal-Image-Gallery/blob/master/files/WhatsApp%20Image%202021-03-23%20at%2021.14.07%20(2).jpeg?raw=true" width="200"/>  
 
 
-## The Login screen gets you through the login setup
+## The Login screen gets you through the login  setup
 
 After login your are taken to a similar page
 - You can either take the picture directly from the camera 
