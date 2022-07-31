@@ -21,6 +21,7 @@ After login your are taken to a similar page
 <p>&nbsp;</p>
 <p>&nbsp;</p>
 <p>&nbsp;</p>
+
 <p>&nbsp;</p>
 
 <img align="left" alt="GIF" src="https://github.com/adi-code22/Personal-Image-Gallery/blob/master/files/WhatsApp%20Image%202021-03-23%20at%2021.14.07%20(4).jpeg?raw=true" width="200"/>  
